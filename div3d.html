@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ciudad 3D en Perspectiva</title>
+  <title>Ciudad 3D Interactiva</title>
   <style>
     body {
       margin: 0;
@@ -11,7 +11,7 @@
       justify-content: center;
       align-items: center;
       background: #87ceeb; /* cielo */
-      perspective: 1000px; /* activa la perspectiva */
+      perspective: 1200px; /* profundidad */
       overflow: hidden;
     }
 
@@ -32,47 +32,33 @@
         #999 30px,
         #999 60px
       );
-      transform: rotateX(60deg);
+      transform: rotateX(90deg) translateY(300px);
       transform-origin: center;
       position: absolute;
-      top: 0;
-      left: 0;
     }
 
-    /* Edificio */
     .edificio {
-      width: 80px;
-      height: 200px;
+      width: 60px;
+      height: 150px;
       background: #444;
       position: absolute;
-      bottom: 100px;
-      left: 150px;
-      transform: translateZ(50px);
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
 
-    /* Comercio */
     .comercio {
       width: 100px;
       height: 80px;
       background: #b5651d;
       position: absolute;
-      bottom: 80px;
-      left: 300px;
-      transform: translateZ(30px);
       box-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
 
-    /* Árbol */
     .arbol {
       width: 40px;
-      height: 60px;
+      height: 40px;
       background: green;
       border-radius: 50%;
       position: absolute;
-      bottom: 60px;
-      left: 450px;
-      transform: translateZ(20px);
       box-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
 
@@ -81,28 +67,41 @@
       height: 20px;
       background: #8b4513;
       position: absolute;
-      bottom: 40px;
-      left: 465px;
-      transform: translateZ(20px);
+    }
+
+    button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 8px 12px;
+      background: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005a9e;
     }
   </style>
 </head>
 <body>
+  <button onclick="resetView()">Resetear Vista</button>
   <div class="escena" id="escena">
     <div class="piso"></div>
-    <div class="edificio"></div>
-    <div class="comercio"></div>
-    <div class="arbol"></div>
-    <div class="tronco"></div>
+    <div class="comercio" style="transform: translateX(100px) translateY(160px) translateZ(30px);"></div>
   </div>
 
   <script>
     const escena = document.getElementById("escena");
     let isDragging = false;
     let lastX, lastY;
-    let rotX = 60;
+    let rotX = -30;
     let rotY = 0;
+    let autoRotate = false;
+    let autoInterval;
 
+    // Rotación con el mouse
     escena.addEventListener("mousedown", (e) => {
       isDragging = true;
       lastX = e.clientX;
@@ -115,7 +114,7 @@
         const deltaY = e.clientY - lastY;
         rotY += deltaX * 0.5;
         rotX -= deltaY * 0.5;
-        escena.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+        updateRotation();
         lastX = e.clientX;
         lastY = e.clientY;
       }
@@ -124,6 +123,69 @@
     document.addEventListener("mouseup", () => {
       isDragging = false;
     });
+
+    // Función para actualizar rotación
+    function updateRotation() {
+      escena.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
+
+    // Función para resetear vista
+    function resetView() {
+      rotX = -30;
+      rotY = 0;
+      updateRotation();
+    }
+
+    // Función para añadir edificios en cuadrícula
+    function crearEdificios() {
+      for (let i = -200; i <= 200; i += 100) {
+        for (let j = -200; j <= 200; j += 100) {
+          const edificio = document.createElement("div");
+          edificio.className = "edificio";
+          edificio.style.transform = `translateX(${i}px) translateY(150px) translateZ(${j}px)`;
+          escena.appendChild(edificio);
+        }
+      }
+    }
+
+    // Función para añadir árboles aleatorios
+    function crearArboles(cantidad = 5) {
+      for (let i = 0; i < cantidad; i++) {
+        const x = Math.floor(Math.random() * 400) - 200;
+        const z = Math.floor(Math.random() * 400) - 200;
+        const arbol = document.createElement("div");
+        arbol.className = "arbol";
+        arbol.style.transform = `translateX(${x}px) translateY(140px) translateZ(${z}px)`;
+        escena.appendChild(arbol);
+
+        const tronco = document.createElement("div");
+        tronco.className = "tronco";
+        tronco.style.transform = `translateX(${x+15}px) translateY(170px) translateZ(${z}px)`;
+        escena.appendChild(tronco);
+      }
+    }
+
+    // Función para animar la escena
+    function activarAutoRotacion() {
+      if (!autoRotate) {
+        autoRotate = true;
+        autoInterval = setInterval(() => {
+          rotY += 1;
+          updateRotation();
+        }, 50);
+      } else {
+        autoRotate = false;
+        clearInterval(autoInterval);
+      }
+    }
+
+    // Inicializar ciudad
+    crearEdificios();
+    crearArboles(8);
+    updateRotation();
+
+    // Activa rotación automática al hacer doble clic
+    escena.addEventListener("dblclick", activarAutoRotacion);
   </script>
 </body>
 </html>
