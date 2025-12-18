@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Estadísticas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      padding: 10px 15px;
+      margin: 10px 0;
+      background: #0078d7;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background: #005a9e;
+    }
+    .resultado {
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    pre {
+      background: #eee;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simulador de Estadísticas ⚽</h1>
+  <p>Haz clic en el botón para simular intentos y calcular la efectividad.</p>
+  
+  <button onclick="ejecutarSimulacion()">Simular</button>
+  
+  <div class="resultado">
+    <h2>Resultados</h2>
+    <pre id="stats"></pre>
+    <p><strong>Efectividad total:</strong> <span id="efectividad"></span></p>
+  </div>
+
+  <script>
+    // Const principal con estructura de estadísticas
+    const estadisticas = {
+      duelosTerrestres: { ganados: 0, intentos: 0 },
+      duelosAereos: { ganados: 0, intentos: 0 },
+      dribles: { exitosos: 0, intentos: 0 }
+    };
+
+    // Función para simular intentos y aciertos
+    function simular(stats) {
+      for (const key in stats) {
+        const intentos = Math.floor(Math.random() * 20) + 5; // entre 5 y 25 intentos
+        const aciertos = Math.floor(Math.random() * intentos); // aciertos ≤ intentos
+
+        if (key === "dribles") {
+          stats[key].exitosos = aciertos;
+        } else {
+          stats[key].ganados = aciertos;
+        }
+        stats[key].intentos = intentos;
+      }
+    }
+
+    // Función para calcular efectividad total
+    function calcularEfectividad(stats) {
+      let totalGanados = 0;
+      let totalIntentos = 0;
+
+      for (const key in stats) {
+        const { ganados, exitosos, intentos } = stats[key];
+        totalGanados += ganados || exitosos;
+        totalIntentos += intentos;
+      }
+
+      return ((totalGanados / totalIntentos) * 100).toFixed(2) + "%";
+    }
+
+    // Función principal que ejecuta todo
+    function ejecutarSimulacion() {
+      simular(estadisticas);
+      document.getElementById("stats").textContent = JSON.stringify(estadisticas, null, 2);
+      document.getElementById("efectividad").textContent = calcularEfectividad(estadisticas);
+    }
+  </script>
+</body>
+</html>
