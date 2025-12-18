@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Piso Arrastrable con Perspectiva</title>
+  <title>Piso 3D Interactivo</title>
   <style>
     body {
       margin: 0;
@@ -11,8 +11,14 @@
       justify-content: center;
       align-items: center;
       background: #87ceeb; /* cielo */
-      perspective: 800px; /* activa la perspectiva */
+      perspective: 1000px; /* activa la perspectiva */
       overflow: hidden;
+    }
+
+    .escena {
+      width: 400px;
+      height: 400px;
+      transform-style: preserve-3d; /* permite 3D */
     }
 
     .piso {
@@ -26,35 +32,38 @@
         #999 40px
       ); /* patrón tipo baldosas */
       transform: rotateX(60deg);
-      transform-origin: top center;
+      transform-origin: center;
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      position: absolute; /* necesario para moverlo */
-      cursor: grab;
-    }
-
-    .piso:active {
-      cursor: grabbing;
     }
   </style>
 </head>
 <body>
-  <div class="piso" id="piso"></div>
+  <div class="escena" id="escena">
+    <div class="piso" id="piso"></div>
+  </div>
 
   <script>
-    const piso = document.getElementById("piso");
+    const escena = document.getElementById("escena");
     let isDragging = false;
-    let offsetX, offsetY;
+    let lastX, lastY;
+    let rotX = 60; // inclinación inicial
+    let rotY = 0;
 
-    piso.addEventListener("mousedown", (e) => {
+    escena.addEventListener("mousedown", (e) => {
       isDragging = true;
-      offsetX = e.clientX - piso.offsetLeft;
-      offsetY = e.clientY - piso.offsetTop;
+      lastX = e.clientX;
+      lastY = e.clientY;
     });
 
     document.addEventListener("mousemove", (e) => {
       if (isDragging) {
-        piso.style.left = (e.clientX - offsetX) + "px";
-        piso.style.top = (e.clientY - offsetY) + "px";
+        const deltaX = e.clientX - lastX;
+        const deltaY = e.clientY - lastY;
+        rotY += deltaX * 0.5; // rotación horizontal
+        rotX -= deltaY * 0.5; // rotación vertical
+        escena.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+        lastX = e.clientX;
+        lastY = e.clientY;
       }
     });
 
