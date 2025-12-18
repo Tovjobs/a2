@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Chart.js Pie/Doughnut Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    canvas {
+      max-width: 600px;
+      max-height: 400px;
+    }
+    .buttons {
+      margin-top: 20px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Ejemplo Chart.js Pie/Doughnut con acciones</h2>
+  <canvas id="myChart"></canvas>
+  <div class="buttons" id="buttons"></div>
+
+  <script>
+    // Utils básicos
+    const Utils = {
+      transparentize(color, opacity) {
+        const alpha = opacity === undefined ? 0.5 : 1 - opacity;
+        return color.replace('rgb', 'rgba').replace(')', `, ${alpha})`);
+      },
+      numbers({count, min, max}) {
+        const arr = [];
+        for (let i = 0; i < count; i++) {
+          arr.push(Math.floor(Math.random() * (max - min + 1)) + min);
+        }
+        return arr;
+      },
+      srand(seed) {
+        // Simple pseudo-random seed (no determinístico real, pero suficiente para demo)
+        Math.seed = seed;
+      }
+    };
+
+    const DATA_COUNT = 5;
+    Utils.srand(110);
+
+    function generateData() {
+      return Utils.numbers({
+        count: DATA_COUNT,
+        min: -100,
+        max: 100
+      });
+    }
+
+    const data = {
+      datasets: [{
+        data: generateData()
+      }]
+    };
+
+    function colorize(opaque, hover, ctx) {
+      const v = ctx.parsed;
+      const c = v < -50 ? '#D60000'
+        : v < 0 ? '#F46300'
+        : v < 50 ? '#0358B6'
+        : '#44DE28';
+
+      const opacity = hover ? 1 - Math.abs(v / 150) - 0.2 : 1 - Math.abs(v / 150);
+
+      return opaque ? c : Utils.transparentize(c, opacity);
+    }
+
+    function hoverColorize(ctx) {
+      return colorize(false, true, ctx);
+    }
+
+    const config = {
+      type: 'pie',
+      data: data,
+      options: {
+        plugins: {
+          legend: false,
+          tooltip: false,
+        },
+        elements: {
+          arc: {
+            backgroundColor: colorize.bind(null, false, false),
+            hoverBackgroundColor: hoverColorize
+          }
+        }
+      }
+    };
+
+    const myChart = new Chart(
+      document.getElementById('myChart'),
+      config
+    );
+
+    // Acciones
+    const actions = [
+      {
+        name: 'Randomize',
+        handler(chart) {
+          chart.data.datasets.forEach(dataset => {
+            dataset.data = generateData();
+          });
+          chart.update();
+        }
+      },
+      {
+        name: 'Toggle Doughnut View',
+        handler(chart) {
+          if (chart.options.cutout) {
+            chart.options.cutout = 0;
+          } else {
+            chart.options.cutout = '50%';
+          }
+          chart.update();
+        }
+      }
+    ];
+
+    // Generar botones dinámicamente
+    const buttonsDiv = document.getElementById('buttons');
+    actions.forEach(action => {
+      const btn = document.createElement('button');
+      btn.textContent = action.name;
+      btn.addEventListener('click', () => action.handler(myChart));
+      buttonsDiv.appendChild(btn);
+    });
+  </script>
+</body>
+</html>
