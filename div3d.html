@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Piso con Perspectiva</title>
+  <title>Piso Arrastrable con Perspectiva</title>
   <style>
     body {
       margin: 0;
@@ -12,6 +12,7 @@
       align-items: center;
       background: #87ceeb; /* cielo */
       perspective: 800px; /* activa la perspectiva */
+      overflow: hidden;
     }
 
     .piso {
@@ -24,13 +25,42 @@
         #999 20px,
         #999 40px
       ); /* patrón tipo baldosas */
-      transform: rotateX(60deg); /* inclina el div como piso */
+      transform: rotateX(60deg);
       transform-origin: top center;
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      position: absolute; /* necesario para moverlo */
+      cursor: grab;
+    }
+
+    .piso:active {
+      cursor: grabbing;
     }
   </style>
 </head>
 <body>
-  <div class="piso"></div>
+  <div class="piso" id="piso"></div>
+
+  <script>
+    const piso = document.getElementById("piso");
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    piso.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - piso.offsetLeft;
+      offsetY = e.clientY - piso.offsetTop;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        piso.style.left = (e.clientX - offsetX) + "px";
+        piso.style.top = (e.clientY - offsetY) + "px";
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+  </script>
 </body>
 </html>
