@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ciudad 3D Interactiva</title>
+  <title>Mapa 3D Interactivo</title>
   <style>
     body {
       margin: 0;
@@ -10,8 +10,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #87ceeb; /* cielo */
-      perspective: 1200px; /* profundidad */
+      background: #87ceeb;
+      perspective: 1200px;
       overflow: hidden;
     }
 
@@ -37,20 +37,21 @@
       position: absolute;
     }
 
+    .objeto {
+      position: absolute;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
     .edificio {
       width: 60px;
       height: 150px;
       background: #444;
-      position: absolute;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
 
     .comercio {
       width: 100px;
       height: 80px;
       background: #b5651d;
-      position: absolute;
-      box-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
 
     .arbol {
@@ -58,48 +59,25 @@
       height: 40px;
       background: green;
       border-radius: 50%;
-      position: absolute;
-      box-shadow: 0 0 5px rgba(0,0,0,0.5);
     }
 
     .tronco {
       width: 10px;
       height: 20px;
       background: #8b4513;
-      position: absolute;
-    }
-
-    button {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      padding: 8px 12px;
-      background: #0078d7;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #005a9e;
     }
   </style>
 </head>
 <body>
-  <button onclick="resetView()">Resetear Vista</button>
   <div class="escena" id="escena">
     <div class="piso"></div>
-    <div class="comercio" style="transform: translateX(100px) translateY(160px) translateZ(30px);"></div>
   </div>
 
   <script>
     const escena = document.getElementById("escena");
-    let isDragging = false;
-    let lastX, lastY;
     let rotX = -30;
     let rotY = 0;
-    let autoRotate = false;
-    let autoInterval;
+    let isDragging = false, lastX, lastY;
 
     // Rotación con el mouse
     escena.addEventListener("mousedown", (e) => {
@@ -120,72 +98,34 @@
       }
     });
 
-    document.addEventListener("mouseup", () => {
-      isDragging = false;
-    });
+    document.addEventListener("mouseup", () => isDragging = false);
 
-    // Función para actualizar rotación
     function updateRotation() {
       escena.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
     }
 
-    // Función para resetear vista
-    function resetView() {
-      rotX = -30;
-      rotY = 0;
-      updateRotation();
+    // Función para estrenar objetos sobre el mapa
+    function estrenarObjeto(tipo, x, z) {
+      const objeto = document.createElement("div");
+      objeto.classList.add("objeto", tipo);
+
+      // Ajustar altura según tipo
+      let y = 150; // altura base
+      if (tipo === "comercio") y = 160;
+      if (tipo === "arbol") y = 140;
+      if (tipo === "tronco") y = 170;
+
+      objeto.style.transform = `translateX(${x}px) translateY(${y}px) translateZ(${z}px)`;
+      escena.appendChild(objeto);
     }
 
-    // Función para añadir edificios en cuadrícula
-    function crearEdificios() {
-      for (let i = -200; i <= 200; i += 100) {
-        for (let j = -200; j <= 200; j += 100) {
-          const edificio = document.createElement("div");
-          edificio.className = "edificio";
-          edificio.style.transform = `translateX(${i}px) translateY(150px) translateZ(${j}px)`;
-          escena.appendChild(edificio);
-        }
-      }
-    }
+    // Estrenamos varios objetos sobre el mapa
+    estrenarObjeto("edificio", -150, -100);
+    estrenarObjeto("comercio", 100, 50);
+    estrenarObjeto("arbol", 200, -50);
+    estrenarObjeto("tronco", 200, -50);
 
-    // Función para añadir árboles aleatorios
-    function crearArboles(cantidad = 5) {
-      for (let i = 0; i < cantidad; i++) {
-        const x = Math.floor(Math.random() * 400) - 200;
-        const z = Math.floor(Math.random() * 400) - 200;
-        const arbol = document.createElement("div");
-        arbol.className = "arbol";
-        arbol.style.transform = `translateX(${x}px) translateY(140px) translateZ(${z}px)`;
-        escena.appendChild(arbol);
-
-        const tronco = document.createElement("div");
-        tronco.className = "tronco";
-        tronco.style.transform = `translateX(${x+15}px) translateY(170px) translateZ(${z}px)`;
-        escena.appendChild(tronco);
-      }
-    }
-
-    // Función para animar la escena
-    function activarAutoRotacion() {
-      if (!autoRotate) {
-        autoRotate = true;
-        autoInterval = setInterval(() => {
-          rotY += 1;
-          updateRotation();
-        }, 50);
-      } else {
-        autoRotate = false;
-        clearInterval(autoInterval);
-      }
-    }
-
-    // Inicializar ciudad
-    crearEdificios();
-    crearArboles(8);
     updateRotation();
-
-    // Activa rotación automática al hacer doble clic
-    escena.addEventListener("dblclick", activarAutoRotacion);
   </script>
 </body>
 </html>
