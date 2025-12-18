@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Piso 3D Interactivo</title>
+  <title>Ciudad 3D en Perspectiva</title>
   <style>
     body {
       margin: 0;
@@ -16,37 +16,91 @@
     }
 
     .escena {
-      width: 400px;
-      height: 400px;
-      transform-style: preserve-3d; /* permite 3D */
+      width: 600px;
+      height: 600px;
+      transform-style: preserve-3d;
+      position: relative;
     }
 
     .piso {
-      width: 400px;
-      height: 400px;
+      width: 600px;
+      height: 600px;
       background: repeating-linear-gradient(
         45deg,
         #666,
-        #666 20px,
-        #999 20px,
-        #999 40px
-      ); /* patrón tipo baldosas */
+        #666 30px,
+        #999 30px,
+        #999 60px
+      );
       transform: rotateX(60deg);
       transform-origin: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Edificio */
+    .edificio {
+      width: 80px;
+      height: 200px;
+      background: #444;
+      position: absolute;
+      bottom: 100px;
+      left: 150px;
+      transform: translateZ(50px);
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    /* Comercio */
+    .comercio {
+      width: 100px;
+      height: 80px;
+      background: #b5651d;
+      position: absolute;
+      bottom: 80px;
+      left: 300px;
+      transform: translateZ(30px);
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    /* Árbol */
+    .arbol {
+      width: 40px;
+      height: 60px;
+      background: green;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 60px;
+      left: 450px;
+      transform: translateZ(20px);
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    .tronco {
+      width: 10px;
+      height: 20px;
+      background: #8b4513;
+      position: absolute;
+      bottom: 40px;
+      left: 465px;
+      transform: translateZ(20px);
     }
   </style>
 </head>
 <body>
   <div class="escena" id="escena">
-    <div class="piso" id="piso"></div>
+    <div class="piso"></div>
+    <div class="edificio"></div>
+    <div class="comercio"></div>
+    <div class="arbol"></div>
+    <div class="tronco"></div>
   </div>
 
   <script>
     const escena = document.getElementById("escena");
     let isDragging = false;
     let lastX, lastY;
-    let rotX = 60; // inclinación inicial
+    let rotX = 60;
     let rotY = 0;
 
     escena.addEventListener("mousedown", (e) => {
@@ -59,8 +113,8 @@
       if (isDragging) {
         const deltaX = e.clientX - lastX;
         const deltaY = e.clientY - lastY;
-        rotY += deltaX * 0.5; // rotación horizontal
-        rotX -= deltaY * 0.5; // rotación vertical
+        rotY += deltaX * 0.5;
+        rotX -= deltaY * 0.5;
         escena.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
         lastX = e.clientX;
         lastY = e.clientY;
