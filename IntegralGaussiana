@@ -1,0 +1,14 @@
+## La Integral Gaussiana
+
+La **integral gaussiana** (también conocida como la integral de Euler-Poisson) es una de las integrales definidas más importantes en matemáticas, física y estadística. Su valor en todo el eje real es exacto y se expresa mediante la siguiente fórmula:
+
+$$ \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi} $$
+
+---
+
+### Aplicaciones y Propiedades Clave
+
+* **Estadística y Probabilidad:** Es el fundamento matemático de la función de densidad de probabilidad de la distribución normal (o gaussiana).
+* **Simetría:** Dado que la función $f(x) = e^{-x^2}$ es par y simétrica respecto al eje $y$, la integral desde cero hasta infinito equivale exactamente a la mitad: $\frac{\sqrt{\pi}}{2}$.
+* **Método de Resolución:** No se puede resolver utilizando métodos elementales de antiderivadas convencionales. El truco clásico consiste en calcular su cuadrado ($I^2$) y convertir el producto de integrales en una integral doble utilizando coordenadas polares.
+* **Física Teórica:** Es recurrente en campos como la mecánica cuántica, la teoría cinética de gases y la termodinámica estadística.
